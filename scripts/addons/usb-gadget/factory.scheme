@@ -1,0 +1,56 @@
+attrs :
+{
+    bcdUSB = 0x200;
+    idVendor = 0x1D6B;
+    idProduct = 0x6d99;
+};
+os_descs :
+{
+    use = 1;
+    qw_sign = "MSFT100";
+    b_vendor_code = 0xbc;
+};
+
+strings = (
+    {
+        lang = 0x409;
+        manufacturer = "KALIASSISTANT";
+        product = "LICHEE-JACK V1.0 SharkJack/LANTap (FACTORY MODE)";
+        serialnumber = "00000000000000000000000000000000";
+    }
+);
+functions :
+{
+    rndis_usb0 : 
+    {
+        instance = "usb0";
+        type = "rndis";
+        os_descs = (
+            {
+                interface = "rndis";
+                compatible_id = "RNDIS";
+                sub_compatible_id = "5162001";
+            });
+        attrs :
+        {
+            dev_addr = "42:61:64:ab:cc:69";
+            host_addr = "48:6f:73:0f:56:90";
+        };
+    };    
+};
+
+configs = (
+    {
+        id = 1;
+        name = "c";
+        attrs :
+        {
+            bmAttributes = 0x80;
+            bMaxPower = 250;
+        };
+        functions = (
+            {
+                name = "rndis.usb0";
+                function = "rndis_usb0";
+            });
+    } );

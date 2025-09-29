@@ -28,10 +28,44 @@ void suck_loop(uint64_t loop) {
         }
 }
 
+static inline void user_led_on(void) {
+	uint32_t val;
+
+        val = mmio_read_32(0x03020000);
+        val |= (1 << 14);
+        mmio_write_32(0x03020000, val);
+}
+
+static inline void user_led_off(void) {
+	uint32_t val;
+
+        val = mmio_read_32(0x03020000);
+        val &= ~(1 << 14);
+        mmio_write_32(0x03020000, val);
+}
+
+static inline void user_led_toggle(void) {
+	uint32_t val;
+
+        val = mmio_read_32(0x03020000);
+        val ^= (1 << 14);
+        mmio_write_32(0x03020000, val);
+}
+
+
+
 int cvi_board_init(void)
 {
         uint32_t val;
 
+        // LED 
+        mmio_write_32(0x03001038, 0x3); // SD0_PWR_EN/XGPIOA_14
+        //PINMUX_CONFIG(SD0_PWR_EN, XGPIOA_14);
+        val = mmio_read_32(0x03020004); // GPIOA DIR
+        val |= (1 << 14); // output
+        mmio_write_32(0x03020004, val);
+	      user_led_toggle();
+        
         // wifi power reset
         mmio_write_32(0x0300104C, 0x3); // GPIOA 26
         val = mmio_read_32(0x03020004); // GPIOA DIR
@@ -43,6 +77,8 @@ int cvi_board_init(void)
         mmio_write_32(0x03020000, val);
 
         suck_loop(200);
+
+        user_led_toggle();
 
         val = mmio_read_32(0x03020000); // signal level
         val |= (1 << 26); // set level to high
@@ -56,9 +92,7 @@ int cvi_board_init(void)
         mmio_write_32(0x030010E0, 0x0); // CMD
         mmio_write_32(0x030010E4, 0x0); // CLK
 
-        // LED 
-        //mmio_write_32(0x03001038, 0x3); // SD0_PWR_EN/XGPIOA_14
-        PINMUX_CONFIG(SD0_PWR_EN, XGPIOA_14);
+        user_led_toggle();
 
         // uart bluetooth
         //mmio_write_32(0x03001070, 0x1); // GPIOA 28 UART1 TX
@@ -70,37 +104,51 @@ int cvi_board_init(void)
         //mmio_write_32(0x03001068, 0x2); // GPIOA 18 PWM 6
 
         // lcd reset
-        mmio_write_32(0x030010A4, 0x0); // PWRGPIO 0 GPIO_MODE
+        //mmio_write_32(0x030010A4, 0x0); // PWRGPIO 0 GPIO_MODE
 
         // lcd backlight
         //mmio_write_32(0x030010EC, 0x0); // GPIOB 0 PWM0_BUCK
-        mmio_write_32(0x030010EC, 0x3); // GPIOB 0 GPIO_MODE
-        val = mmio_read_32(0x03021004); // GPIOB DIR
-        val |= (1 << 0); // output
-        mmio_write_32(0x03021004, val);
-        val = mmio_read_32(0x03021000); // signal level
-        val |= (1 << 0); // set level to high
-        mmio_write_32(0x03021000, val);
+        //mmio_write_32(0x030010EC, 0x3); // GPIOB 0 GPIO_MODE
+        //val = mmio_read_32(0x03021004); // GPIOB DIR
+        //val |= (1 << 0); // output
+        //mmio_write_32(0x03021004, val);
+        //val = mmio_read_32(0x03021000); // signal level
+        //val |= (1 << 0); // set level to high
+        //mmio_write_32(0x03021000, val);
 
         // camera function
-        mmio_write_32(0x0300116C, 0x5); // RX4N CAM_MCLK0
+        //mmio_write_32(0x0300116C, 0x5); // RX4N CAM_MCLK0
 
         // camera/tp i2c
-        mmio_write_32(0x03001090, 0x5); // PWR_GPIO6 IIC4_SCL
-        mmio_write_32(0x03001098, 0x5); // PWR_GPIO8 IIC4_SDA
+        //mmio_write_32(0x03001090, 0x5); // PWR_GPIO6 IIC4_SCL
+        //mmio_write_32(0x03001098, 0x5); // PWR_GPIO8 IIC4_SDA
 
         // tp function
-        mmio_write_32(0x03001084, 0x3); // PWR_SEQ1 PWR_GPIO[3]
-        mmio_write_32(0x03001088, 0x3); // PWR_SEQ2 PWR_GPIO[4]
-        mmio_write_32(0x05027078, 0x11);// Unlock PWR_GPIO[3]
-        mmio_write_32(0x0502707c, 0x11);// Unlock PWR_GPIO[4]
+        //mmio_write_32(0x03001084, 0x3); // PWR_SEQ1 PWR_GPIO[3]
+        //mmio_write_32(0x03001088, 0x3); // PWR_SEQ2 PWR_GPIO[4]
+        //mmio_write_32(0x05027078, 0x11);// Unlock PWR_GPIO[3]
+        //mmio_write_32(0x0502707c, 0x11);// Unlock PWR_GPIO[4]
 
         // bitbang i2c for maixcam
 #ifdef MAIXCAM
-        mmio_write_32(0x0300105C, 0x3);// GPIOA 23 GPIO_MODE
-        mmio_write_32(0x03001060, 0x3);// GPIOA 24 GPIO_MODE
+        //mmio_write_32(0x0300105C, 0x3);// GPIOA 23 GPIO_MODE
+        //mmio_write_32(0x03001060, 0x3);// GPIOA 24 GPIO_MODE
 #endif
+        mmio_write_32(0x0300103C, 0x03); // GPIOA 15 GPIO_MODE
+        mmio_write_32(0x03001044, 0x03); // GPIOA 17 GPIO_MODE
+	      mmio_write_32(0x03001054, 0x03); // GPIOA 25 GPIO_MODE
+        mmio_write_32(0x03001058, 0x03); // GPIOA 27 GPIO_MODE
+
+        val = mmio_read_32(0x03020004); // GPIOA DIR
+        val |= (1 << 25); // output
+        mmio_write_32(0x03020004, val);
+
+        val = mmio_read_32(0x03020004); // GPIOA DIR
+        val |= (1 << 27); // output
+        mmio_write_32(0x03020004, val);
+
         // wait hardware bootup
         suck_loop(100);
+        user_led_off();
         return 0;
 }

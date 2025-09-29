@@ -21,21 +21,25 @@
 
 
 &uart1 {
-        status = "okay";
+        status = "disabled";
 };
 
 
 &i2c4 {
-        statuc = "okay";
+        status = "disabled";
         gt9xx: gt9xx@14 {
                 compatible = "goodix,gt911";
                 reg = <0x14>;
-		interrupts = <3 0 IRQ_TYPE_EDGE_FALLING>;
-		interrupt-parent = <&porte>;
+                interrupts = <3 0 IRQ_TYPE_EDGE_FALLING>;
+                interrupt-parent = <&porte>;
                 irq-gpios= <&porte 3 0>;
                 reset-gpios = <&porte 4 0>;
-                status = "okay";
+                status = "disabled";
         };
+};
+
+&spi1 {
+        status = "okay";
 };
 
 &dac {
@@ -44,23 +48,23 @@
 };
 
 &soc_thermal_0 {
-	cooling-maps {
-		map0 {
-			trip = <&soc_thermal_trip_0>;
-			cooling-device = <&cv181x_cooling THERMAL_NO_LIMIT 1>;
-		};
-		map1 {
-			trip = <&soc_thermal_trip_1>;
-			cooling-device = <&cv181x_cooling THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
-		};
-	};
+        cooling-maps {
+                map0 {
+                        trip = <&soc_thermal_trip_0>;
+                        cooling-device = <&cv181x_cooling THERMAL_NO_LIMIT 1>;
+                };
+                map1 {
+                        trip = <&soc_thermal_trip_1>;
+                        cooling-device = <&cv181x_cooling THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+                };
+        };
 };
 
 / {
         model = "LicheeRv Nano";
-
-	/delete-node/ wifi_pin;
-	/delete-node/ bt_pin;
+        
+        /delete-node/ wifi_pin;
+        /delete-node/ bt_pin;
 
         gpio-keys {
                 compatible = "gpio-keys";
@@ -102,18 +106,22 @@
         };
 
         leds {
-        	compatible = "gpio-leds";
-	        led0 {
-		        gpios = <&porta 14 GPIO_ACTIVE_LOW>;
-		        linux,default-trigger = "heartbeat";
-		        function = LED_FUNCTION_HEARTBEAT;
-	        };
+                compatible = "gpio-leds";
+                led0 {
+                        gpios = <&porta 14 GPIO_ACTIVE_HIGH>;
+                        linux,default-trigger = "heartbeat";
+                        function = LED_FUNCTION_HEARTBEAT;
+                };
+                ws2812b {
+                        gpios = <&porta 27 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+                };
         };
 #ifndef __UBOOT__        
         mbox: mbox@0x01900000 {
                 compatible = "cvitek,sg200x-mailbox";
-		reg = <0x0 0x01900000 0x0 0x1000>;
-		reg-names = "mailbox";
+                reg = <0x0 0x01900000 0x0 0x1000>;
+                reg-names = "mailbox";
                 interrupts	= <101 IRQ_TYPE_LEVEL_HIGH>;
                 interrupt-parent = <&plic0>;
                 status = "okay";
@@ -121,17 +129,17 @@
         };
 
         cv181x-c906_1 {
-		compatible	= "cvitek,cv181x-c906_1";
-		memory-region	= <&fast_image &vdev0vring0 &vdev0vring1 &vdev0buffer>;
+                compatible	= "cvitek,cv181x-c906_1";
+                memory-region	= <&fast_image &vdev0vring0 &vdev0vring1 &vdev0buffer>;
                 firmware        = "c906-mcu.elf";
                 resets		= <&rst RST_C906_1>;
-		reset-names	= "sw_reset";
+                reset-names	= "sw_reset";
                 clocks		= <&clk CV181X_CLK_C906_1>;
                 clock-names     = "clk_c906_1";
                 mboxes		= <&mbox 0 CVITEK_MBOX_DIRECTION_TX CVITEK_MBOX_C906_1 1>, <&mbox 1 CVITEK_MBOX_DIRECTION_RX CVITEK_MBOX_C906_1 1>;
-	        mbox-names	= "vq_tx", "vq_rx";
+                mbox-names	= "vq_tx", "vq_rx";
                 status		= "okay";
-	};
+        };
 #endif
 };
 

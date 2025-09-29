@@ -24,20 +24,20 @@ dpkg --configure -a
 unset DEBIAN_FRONTEND DEBCONF_NONINTERACTIVE_SEEN
 
 #
-# Change root password to 'rv'
+# Change root password to 'toor'
 #
-usermod --password "$(echo rv | openssl passwd -1 -stdin)" root
+usermod --password "$(echo toor | openssl passwd -1 -stdin)" root
 
 #
-# Add a new user debian and its passwd is `rv`
+# Add a new user debian and its passwd is `licheejack`
 #
 mkdir -p /home/debian
 useradd --password dummy \
     -G cdrom,floppy,sudo,audio,dip,video,plugdev \
     --home-dir /home/debian --shell /bin/bash debian || true
 chown debian:debian /home/debian
-# Set password to 'debian'
-usermod --password "$(echo rv | openssl passwd -1 -stdin)" debian || true
+
+usermod --password "$(echo licheejack | openssl passwd -1 -stdin)" debian || true
 
 # Set up fstab
 cat > /etc/fstab <<EOF
@@ -51,6 +51,11 @@ if [ "$STORAGETYPE" = "sd" ]; then
 EOF
 fi
 
+
+# Allow Root Login When Factory Mode
+grep -q '^#\?PermitRootLogin' /etc/ssh/sshd_config \
+  && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
+  || echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
 
 #regenerate SSH keys on first boot
@@ -132,6 +137,11 @@ cat >> /etc/hosts << EOF
 127.0.0.1      ${HOSTNAME} 
 EOF
 
+# Set locale to en_US.UTF8
+sed -i 's/^# *en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
+locale-gen
+update-locale LANG+en_US.UTF8
+
 # 
 # Enable system services
 #
@@ -140,15 +150,20 @@ if [ -f /tmp/install/systemd-enable ]; then
   systemctl enable `cat /tmp/install/systemd-enable`
 fi
 
+if [ -f /tmp/install/systemd-disable ]; then
+  systemctl disable `cat /tmp/install/systemd-disable`
+fi
+
 # Update source list 
 
 rm -rf /etc/apt/sources.list.d/multistrap-debian.list
 
 #apt-key add /tmp/install/public-key.asc
-cp /tmp/install/public-key.asc /etc/apt/trusted.gpg.d/sophgo-myho-st.gpg
+#cp /tmp/install/public-key.asc /etc/apt/trusted.gpg.d/sophgo-myho-st.gpg
+gpg --dearmor -o /etc/apt/trusted.gpg.d/sophgo-myho-st.gpg /tmp/install/public-key.asc
 
 cat > /etc/apt/sources.list <<EOF
-deb http://deb.debian.org/debian sid main non-free-firmware
+deb https://deb.debian.org/debian stable main non-free-firmware
 deb https://sophgo.my-ho.st:8443/ debian sophgo
 EOF
 

@@ -1,1 +1,1 @@
-docker build -t builder -f scripts/Dockerfile .
+docker build -t sophgo-sg200x-debian-builder -f scripts/Dockerfile .
