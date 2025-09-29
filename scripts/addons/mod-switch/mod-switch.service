@@ -1,9 +1,0 @@
-[Unit]
-Description=Lichee-Jack mod-switch payload run
-
-[Service]
-Type=oneshot
-ExecStart=/usr/sbin/mod-payload.sh
-
-[Install]
-WantedBy=multi-user.target
