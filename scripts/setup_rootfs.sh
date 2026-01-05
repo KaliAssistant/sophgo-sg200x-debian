@@ -86,6 +86,35 @@ cat /etc/systemd/system/finalize-image.service
 apt install -y -f /tmp/install/*.deb
 
 
+
+cat > /etc/kernel/postinst.d/zzz-fix-dtb-flat << "EOF"
+#!/bin/sh
+set -e
+
+KVER="$1"
+FDTDIR="/boot/fdt/linux-image-$KVER"
+
+[ -d "$FDTDIR/cvitek" ] || exit 0
+
+echo "Flattening Cvitek DTBs for U-Boot..."
+
+mv "$FDTDIR"/cvitek/*.dtb "$FDTDIR"/
+rmdir "$FDTDIR/cvitek" 2>/dev/null || true
+EOF
+
+chmod 755 /etc/kernel/postinst.d/zzz-fix-dtb-flat
+
+# Create dirs
+mkdir -p /root/payloads.d
+mkdir -p /root/payloads.d/mod1.d
+mkdir -p /root/payloads.d/mod2.d
+mkdir -p /root/loot.d
+mkdir -p /root/udisk.d
+mkdir -p /root/data
+
+ln -sf /etc/gt /root/config/gt
+ln -sf /etc/NetworkManager /root/config/NetworkManager
+
 # change device tree
 echo "===== ln -s dtb files ====="
 file_prefix="/usr/lib/linux-image-*"
@@ -117,12 +146,12 @@ fi
 
 sed -i -e 's|#U_BOOT_SYNC_DTBS=".*"|U_BOOT_SYNC_DTBS="true"|' /etc/default/u-boot
 #doing this dance, as in the chroot, / and /boot are same filesystem, so u-boot-update doesn't setup correctly
-echo "U_BOOT_FDT_DIR=\"/usr/lib/linux-image-$BOARD-\"" >> /etc/default/u-boot
+echo "U_BOOT_FDT_DIR=\"/usr/lib/linux-image-\"" >> /etc/default/u-boot
 u-boot-update
 if [ "$STORAGETYPE" = "sd" ]; then
   sed -i -e 's|fdtdir /usr/lib/|fdtdir /fdt/|' /boot/extlinux/extlinux.conf
   sed -i -e 's|linux /boot/|linux /|' /boot/extlinux/extlinux.conf
-  sed -i -e "s|U_BOOT_FDT_DIR=\".*\"|U_BOOT_FDT_DIR=\"/fdt/linux-image-$BOARD-\"|" /etc/default/u-boot
+  sed -i -e "s|U_BOOT_FDT_DIR=\".*\"|U_BOOT_FDT_DIR=\"/fdt/linux-image-\"|" /etc/default/u-boot
 else 
   sed -i -e 's|fdtdir /usr/lib/|fdtdir /boot/fdt/|' /boot/extlinux/extlinux.conf
 fi

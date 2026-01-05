@@ -3,5 +3,6 @@ $(BUILDDIR)/hciattach-service-stamp:
 	@mkdir -p /rootfs/etc/systemd/system/ 
 	@cp -a addons/hciattach-service/hciattach.service /rootfs/etc/systemd/system/ 
 	@mkdir -p /rootfs/tmp/install/
-	@echo " hciattach bluetooth" >> /rootfs/tmp/install/systemd-enable
+	@echo " hciattach " >> /rootfs/tmp/install/systemd-enable
+	@echo " bluetooth " >> /rootfs/tmp/install/systemd-disable # wireless security
 	@touch $@

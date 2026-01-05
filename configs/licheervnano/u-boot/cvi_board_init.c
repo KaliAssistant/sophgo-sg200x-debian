@@ -95,10 +95,10 @@ int cvi_board_init(void)
         user_led_toggle();
 
         // uart bluetooth
-        //mmio_write_32(0x03001070, 0x1); // GPIOA 28 UART1 TX
-        //mmio_write_32(0x03001074, 0x1); // GPIOA 29 UART1 RX
-        //mmio_write_32(0x03001068, 0x4); // GPIOA 18 UART1 CTS
-        //mmio_write_32(0x03001064, 0x4); // GPIOA 19 UART1 RTS
+        mmio_write_32(0x03001070, 0x1); // GPIOA 28 UART1 TX
+        mmio_write_32(0x03001074, 0x1); // GPIOA 29 UART1 RX
+        mmio_write_32(0x03001068, 0x4); // GPIOA 18 UART1 CTS
+        mmio_write_32(0x03001064, 0x4); // GPIOA 19 UART1 RTS
 
         // PWM
         //mmio_write_32(0x03001068, 0x2); // GPIOA 18 PWM 6
@@ -135,7 +135,7 @@ int cvi_board_init(void)
         //mmio_write_32(0x03001060, 0x3);// GPIOA 24 GPIO_MODE
 #endif
         mmio_write_32(0x0300103C, 0x03); // GPIOA 15 GPIO_MODE
-        mmio_write_32(0x03001044, 0x03); // GPIOA 17 GPIO_MODE
+        mmio_write_32(0x03001060, 0x03); // GPIOA 24 GPIO_MODE
 	      mmio_write_32(0x03001054, 0x03); // GPIOA 25 GPIO_MODE
         mmio_write_32(0x03001058, 0x03); // GPIOA 27 GPIO_MODE
 
