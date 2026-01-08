@@ -20,7 +20,8 @@ RUN apt-get update \
         linux-image-generic genimage joe mc zip \
         fakeroot git kernel-wedge quilt ccache flex bison \
         libssl-dev dh-exec rsync libelf-dev bc gcc-riscv64-unknown-elf \
-    && git clone -b lichee-jack --depth 1 https://github.com/KaliAssistant/host-tools.git /host-tools 
+        && mkdir -p /host-tools/gcc \
+        && wget -O - https://github.com/scpcom/riscv-gnu-toolchain/releases/download/riscv64-gcc-thead_20241206-10.4.0-x86_64/riscv64-linux-gcc-thead_20241206-10.4.0-x86_64.tar.gz | tar -C /host-tools/gcc -xz
 
 
 
