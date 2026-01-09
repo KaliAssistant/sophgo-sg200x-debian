@@ -20,7 +20,7 @@ RUN apt-get update \
         linux-image-generic genimage joe mc zip \
         fakeroot git kernel-wedge quilt ccache flex bison \
         libssl-dev dh-exec rsync libelf-dev bc gcc-riscv64-unknown-elf \
-    && git clone -b lichee-jack --depth 1 https://github.com/KaliAssistant/host-tools.git /host-tools 
+        && git clone -b lichee-jack-gnu --depth 1 https://github.com/KaliAssistant/host-tools.git /host-tools
 
 
 
